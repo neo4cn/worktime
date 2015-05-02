@@ -1,3 +1,5 @@
+--DDL for worktime at sqlite3
+
 CREATE TABLE `worktime` (
 	`date`	TEXT,
 	`personid`	TEXT,
