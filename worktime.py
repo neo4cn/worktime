@@ -1,3 +1,4 @@
+#!python3
 __author__ = 'panying'
 
 #
@@ -16,6 +17,11 @@ __author__ = 'panying'
 #  2、利用第三方xlrd读取每个excel文件工时记录信息
 #  3、利用内置sqlite3库将读取的工时记录写入数据库
 #
+# neo4cn@hotmail.com 2015/5/5
+#  增加评分处理逻辑
+#  1、修改Excel模板，增加评分单元格，修改worktime数据表增加评分字段
+#  2、根据是否有评分，确定是否导入相应项目的工时数据
+#
 
 import os
 import glob
@@ -23,6 +29,7 @@ import datetime
 import sqlite3
 
 import xlrd
+
 
 
 # 根据员工姓名从person表中取相应工号
@@ -69,6 +76,11 @@ def getphaseid(name):
     cursor.execute(sql)
     return cursor.fetchone()[0]
 
+# 根据cell所在行取评分
+def getperformance(row):
+    return sheet.cell(row, 19).value
+
+
 #提示当前工作目录
 dir = os.getcwd()
 print("工作目录:", dir)
@@ -97,20 +109,22 @@ for file in xlsfiles:
 
     #根据单元格位置读取工时数据
     for row in range(5, 9 + 1):
-        for col in range(4, 17 + 1):
-            hour = sheet.cell(row, col).value
-            if hour != "" and hour != 0:
-                date = getdate(col)
-                projectid = getprojectid(getprojectname(row))
-                phaseid = getphaseid(getphasename(row))
-                overflag = getoverflag(col)
-                hour = int(hour)
-                print(date, personid, projectid, phaseid, hour, overflag, end=" ")
-                sql = "insert into worktime values ('%s','%s','%s','%s',%s,%s,'%s')" % (
-                date, personid, projectid, phaseid, hour, overflag, "")
-                try:
-                    cursor.execute(sql)
-                    connect.commit()
-                    print("保存成功.")
-                except sqlite3.IntegrityError:
-                    print("与已有记录重复，保存失败.")
+        performance = getperformance(row)
+        if performance != "" and performance != 0:
+            for col in range(4, 17 + 1):
+                hour = sheet.cell(row, col).value
+                if hour != "" and hour != 0:
+                    date = getdate(col)
+                    projectid = getprojectid(getprojectname(row))
+                    phaseid = getphaseid(getphasename(row))
+                    overflag = getoverflag(col)
+                    hour = int(hour)
+                    print(date, personid, projectid, phaseid, hour, overflag, performance, end=" ")
+                    sql = "insert into worktime values ('%s','%s','%s','%s',%s,%s,%s,'%s')" % (
+                        date, personid, projectid, phaseid, hour, overflag, performance, "")
+                    try:
+                        cursor.execute(sql)
+                        connect.commit()
+                        print("导入成功.")
+                    except sqlite3.IntegrityError:
+                        print("与已有记录重复，导入失败.")
