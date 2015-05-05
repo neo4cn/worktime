@@ -21,6 +21,7 @@ __author__ = 'panying'
 #  增加评分处理逻辑
 #  1、修改Excel模板，增加评分单元格，修改worktime数据表增加评分字段
 #  2、根据是否有评分，确定是否导入相应项目的工时数据
+# 增加导入时间记录
 #
 
 import os
@@ -29,6 +30,7 @@ import datetime
 import sqlite3
 
 import xlrd
+
 
 
 
