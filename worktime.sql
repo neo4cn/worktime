@@ -9,6 +9,7 @@ CREATE TABLE `worktime` (
 	`overflag`	INTEGER NOT NULL,
 	`performance`	INTEGER NOT NULL,
 	`remark`	TEXT,
+	`recordtime`  TEXT NOT NULL,
 	PRIMARY KEY(date,personid,projectid,phaseid,overflag)
 );
 

@@ -32,6 +32,7 @@ import xlrd
 
 
 
+
 # 根据员工姓名从person表中取相应工号
 def getpersonid(name):
     sql = "select id from person where name ='%s'" % name
@@ -120,8 +121,10 @@ for file in xlsfiles:
                     overflag = getoverflag(col)
                     hour = int(hour)
                     print(date, personid, projectid, phaseid, hour, overflag, performance, end=" ")
-                    sql = "insert into worktime values ('%s','%s','%s','%s',%s,%s,%s,'%s')" % (
-                        date, personid, projectid, phaseid, hour, overflag, performance, "")
+                    sql = "insert into worktime values ('%s','%s','%s','%s',%s,%s,%s,'%s','%s')" % (
+                        date, personid, projectid, phaseid, hour, overflag, performance, "",
+                        datetime.datetime.now().strftime("%Y%m%d%H%M%S"))
+                    print(sql)
                     try:
                         cursor.execute(sql)
                         connect.commit()
